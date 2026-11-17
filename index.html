@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="A study planner for university students: courses, tasks, weekly schedule and progress tracking." />
+  <title>Study Planner</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Mobile top bar -->
+  <header class="topbar">
+    <button class="icon-btn" id="menuToggle" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="brand brand-small"><span class="brand-logo">&#10022;</span> Study Planner</div>
+  </header>
+
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand"><span class="brand-logo">&#10022;</span> Study Planner</div>
+      <nav class="nav" aria-label="Main">
+        <button class="nav-link active" data-section="dashboard"><span class="nav-icon">&#8962;</span> Dashboard</button>
+        <button class="nav-link" data-section="courses"><span class="nav-icon">&#128218;</span> Courses</button>
+        <button class="nav-link" data-section="tasks"><span class="nav-icon">&#10003;</span> Tasks</button>
+        <button class="nav-link" data-section="planner"><span class="nav-icon">&#128197;</span> Weekly Planner</button>
+        <button class="nav-link" data-section="progress"><span class="nav-icon">&#9650;</span> Progress</button>
+      </nav>
+      <div class="sidebar-footer">
+        <button class="btn btn-ghost btn-sm" id="resetDataBtn">Reset to sample data</button>
+        <p class="muted small">Your data is saved in this browser.</p>
+      </div>
+    </aside>
+    <div class="overlay" id="overlay"></div>
+
+    <main class="main">
+      <!-- DASHBOARD -->
+      <section class="section active" id="dashboard">
+        <div class="hero">
+          <div>
+            <p class="hero-date" id="todayDate"></p>
+            <h1><span id="greeting">Hello</span>, <span id="studentName">Student</span>!</h1>
+            <p class="hero-sub" id="heroMessage">Let's make today productive.</p>
+          </div>
+          <div class="hero-actions">
+            <button class="btn btn-light" id="editNameBtn">Edit name</button>
+            <button class="btn btn-white" data-open="task">+ New task</button>
+          </div>
+        </div>
+
+        <div class="cards">
+          <div class="card stat">
+            <div class="stat-icon">&#128218;</div>
+            <div><p class="stat-label">Courses</p><p class="stat-value" id="statCourses">0</p><p class="stat-sub" id="statCredits">0 credits</p></div>
+          </div>
+          <div class="card stat">
+            <div class="stat-icon">&#9203;</div>
+            <div><p class="stat-label">Pending tasks</p><p class="stat-value" id="statPending">0</p><p class="stat-sub" id="statOverdue">0 overdue</p></div>
+          </div>
+          <div class="card stat">
+            <div class="stat-icon">&#128197;</div>
+            <div><p class="stat-label">Due this week</p><p class="stat-value" id="statWeek">0</p><p class="stat-sub">next 7 days</p></div>
+          </div>
+          <div class="card stat">
+            <div class="stat-icon">&#127942;</div>
+            <div><p class="stat-label">Completed</p><p class="stat-value" id="statProgress">0%</p><p class="stat-sub" id="statDoneCount">0 of 0 tasks</p></div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head">
+              <h2>Upcoming tasks</h2>
+              <button class="btn btn-ghost btn-sm" data-goto="tasks">View all</button>
+            </div>
+            <ul class="mini-list" id="upcomingList"></ul>
+          </div>
+          <div class="card">
+            <div class="card-head">
+              <h2>Today's study sessions</h2>
+              <button class="btn btn-ghost btn-sm" data-goto="planner">Open planner</button>
+            </div>
+            <ul class="mini-list" id="todaySessions"></ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- COURSES -->
+      <section class="section" id="courses">
+        <div class="section-head">
+          <div>
+            <h1>Courses</h1>
+            <p class="muted">Manage the university courses you're taking this semester.</p>
+          </div>
+          <button class="btn btn-primary" data-open="course">+ Add course</button>
+        </div>
+        <div class="course-grid" id="courseGrid"></div>
+      </section>
+
+      <!-- TASKS -->
+      <section class="section" id="tasks">
+        <div class="section-head">
+          <div>
+            <h1>Tasks</h1>
+            <p class="muted">Assignments, exams, readings and everything in between.</p>
+          </div>
+          <button class="btn btn-primary" data-open="task">+ Add task</button>
+        </div>
+
+        <div class="card toolbar">
+          <div class="segmented" id="statusFilter" role="group" aria-label="Filter by status">
+            <button class="seg active" data-filter="all">All</button>
+            <button class="seg" data-filter="pending">Pending</button>
+            <button class="seg" data-filter="completed">Completed</button>
+          </div>
+          <div class="toolbar-fields">
+            <label class="field-inline">Course
+              <select id="courseFilter"></select>
+            </label>
+            <label class="field-inline">Sort
+              <select id="sortTasks">
+                <option value="due">Due date</option>
+                <option value="priority">Priority</option>
+                <option value="title">Title</option>
+              </select>
+            </label>
+            <button class="btn btn-ghost btn-sm" id="clearCompletedBtn">Clear completed</button>
+          </div>
+        </div>
+
+        <ul class="task-list" id="taskList"></ul>
+      </section>
+
+      <!-- WEEKLY PLANNER -->
+      <section class="section" id="planner">
+        <div class="section-head">
+          <div>
+            <h1>Weekly Planner</h1>
+            <p class="muted">Plan your study sessions for each day of the week. <span id="weekHours" class="pill">0 h planned</span></p>
+          </div>
+          <button class="btn btn-primary" data-open="session">+ Add session</button>
+        </div>
+        <div class="week" id="weekGrid"></div>
+      </section>
+
+      <!-- PROGRESS -->
+      <section class="section" id="progress">
+        <div class="section-head">
+          <div>
+            <h1>Progress</h1>
+            <p class="muted">See how far you've come this semester.</p>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="card progress-overall">
+            <h2>Overall completion</h2>
+            <div class="ring" id="progressRing" style="--p:0">
+              <div class="ring-inner">
+                <span class="ring-value" id="ringValue">0%</span>
+                <span class="ring-label" id="ringLabel">0 of 0 tasks</span>
+              </div>
+            </div>
+            <p class="muted center" id="progressMessage"></p>
+          </div>
+          <div class="card">
+            <h2>By priority</h2>
+            <div id="priorityProgress" class="bars"></div>
+            <h2 class="mt">This week</h2>
+            <div class="week-stats" id="weekStats"></div>
+          </div>
+        </div>
+        <div class="card">
+          <h2>By course</h2>
+          <div id="courseProgress" class="bars"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Course dialog -->
+  <dialog class="modal" id="courseModal">
+    <form id="courseForm" method="dialog" novalidate>
+      <h2 id="courseModalTitle">Add course</h2>
+      <input type="hidden" id="courseId" />
+      <label class="field">Course name *
+        <input type="text" id="courseName" maxlength="80" required placeholder="e.g. Linear Algebra" />
+      </label>
+      <div class="field-row">
+        <label class="field">Course code
+          <input type="text" id="courseCode" maxlength="20" placeholder="e.g. MATH 201" />
+        </label>
+        <label class="field">Credits
+          <input type="number" id="courseCredits" min="0" max="20" step="0.5" placeholder="3" />
+        </label>
+      </div>
+      <label class="field">Instructor
+        <input type="text" id="courseInstructor" maxlength="60" placeholder="e.g. Dr. Smith" />
+      </label>
+      <div class="field">Color
+        <div class="swatches" id="courseColors"></div>
+      </div>
+      <p class="form-error" id="courseError"></p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" data-close>Cancel</button>
+        <button type="submit" class="btn btn-primary">Save course</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Task dialog -->
+  <dialog class="modal" id="taskModal">
+    <form id="taskForm" method="dialog" novalidate>
+      <h2 id="taskModalTitle">Add task</h2>
+      <input type="hidden" id="taskId" />
+      <label class="field">Task title *
+        <input type="text" id="taskTitle" maxlength="120" required placeholder="e.g. Problem set 3" />
+      </label>
+      <div class="field-row">
+        <label class="field">Course
+          <select id="taskCourse"></select>
+        </label>
+        <label class="field">Due date *
+          <input type="date" id="taskDue" required />
+        </label>
+      </div>
+      <div class="field">Priority
+        <div class="segmented" id="taskPriority" role="radiogroup">
+          <label class="seg-radio"><input type="radio" name="priority" value="low" /> Low</label>
+          <label class="seg-radio"><input type="radio" name="priority" value="medium" checked /> Medium</label>
+          <label class="seg-radio"><input type="radio" name="priority" value="high" /> High</label>
+        </div>
+      </div>
+      <label class="field">Notes
+        <textarea id="taskNotes" rows="3" maxlength="500" placeholder="Optional details"></textarea>
+      </label>
+      <p class="form-error" id="taskError"></p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" data-close>Cancel</button>
+        <button type="submit" class="btn btn-primary">Save task</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Session dialog -->
+  <dialog class="modal" id="sessionModal">
+    <form id="sessionForm" method="dialog" novalidate>
+      <h2 id="sessionModalTitle">Add study session</h2>
+      <input type="hidden" id="sessionId" />
+      <label class="field">Day
+        <select id="sessionDay"></select>
+      </label>
+      <div class="field-row">
+        <label class="field">Start
+          <input type="time" id="sessionStart" required />
+        </label>
+        <label class="field">End
+          <input type="time" id="sessionEnd" required />
+        </label>
+      </div>
+      <label class="field">Course
+        <select id="sessionCourse"></select>
+      </label>
+      <label class="field">Topic
+        <input type="text" id="sessionTopic" maxlength="80" placeholder="e.g. Review chapter 4" />
+      </label>
+      <p class="form-error" id="sessionError"></p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" data-close>Cancel</button>
+        <button type="submit" class="btn btn-primary">Save session</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Name dialog -->
+  <dialog class="modal modal-sm" id="nameModal">
+    <form id="nameForm" method="dialog" novalidate>
+      <h2>What should we call you?</h2>
+      <label class="field">Your name
+        <input type="text" id="nameInput" maxlength="40" required />
+      </label>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" data-close>Cancel</button>
+        <button type="submit" class="btn btn-primary">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Confirm dialog -->
+  <dialog class="modal modal-sm" id="confirmModal">
+    <form method="dialog">
+      <h2 id="confirmTitle">Are you sure?</h2>
+      <p class="muted" id="confirmText"></p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" data-close>Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmOk">Delete</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
